@@ -1,0 +1,23 @@
+---
+namespace: "thzevnik"
+name: "yuuvis-api-roles"
+version: "1.0.17"
+readme: "README.md"
+authors:
+  - "Thiemo Zevnik"
+description: "Collection of roles for deploying momentum charts and it's and underlying infrastructure Tools"
+license:
+  - "Optimal Systems GmbH"
+tags:
+  - kubernetes
+  - momentum
+  - ingress-nginx
+  - cert-manager
+  - open-telemetry
+  - jaeger
+  - development
+  - collection
+repository: "https://www.github.com/crivetimihai/ansible_workstation"
+homepage: "https://www.github.com/crivetimihai/ansible_workstation"
+documentation: "https://www.github.com/crivetimihai/ansible_workstation"
+issues: "https://www.github.com/crivetimihai/ansible_workstation/issues"

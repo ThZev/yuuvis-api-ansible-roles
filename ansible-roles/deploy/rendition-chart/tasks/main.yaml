@@ -1,0 +1,36 @@
+---
+- name: Deploying rendition chart  
+  block:
+    - name:  Deploying rendition chart
+      shell: "helm upgrade --install rendition ./rendition -n {{ namespace }} --create-namespace " 
+  rescue:
+    - name: Abort ongoing upgrade/rollback/install
+      shell: | 
+        kubectl -n {{ namespace }} delete secret -l name=rendition,status=pending-upgrade --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=rendition,status=pending-rollback --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=rendition,status=pending-install --ignore-not-found=true
+
+    - name: Installing rendition chart
+      shell: "helm upgrade --install rendition ./rendition -n {{ namespace }} --create-namespace" 
+  always:
+    - name: Checking deployment success
+      block:
+        - name: Wait until all rendition pods are running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=rendition"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true 
+
+        - name: Waiting untill all rendition pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=rendition --timeout=300s"
+
+        - meta: end_host  
+      rescue:
+        - name: Rolling back failed rendition release
+          shell: "helm rollback rendition -n {{ namespace }}"
+              
+        - name: Stop deployment
+          shell: /bin/false
+...

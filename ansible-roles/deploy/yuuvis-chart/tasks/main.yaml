@@ -1,0 +1,66 @@
+---
+- name: Attempting yuuvis chart deployment
+  block:
+    - name:  Deploying yuuvis chart
+      shell: "helm upgrade --install yuuvis ./yuuvis -n {{ namespace }} --create-namespace" 
+  rescue:
+    - name: Abort ongoing upgrade/rollback/install
+      shell: | 
+        kubectl -n {{ namespace }} delete secret -l name=yuuvis,status=pending-upgrade --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=yuuvis,status=pending-rollback --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=yuuvis,status=pending-install --ignore-not-found=true
+
+    - name: Attempting yuuvis chart deployment    
+      block:
+        - name: Deploying yuuvis chart
+          shell: "helm upgrade --install yuuvis ./yuuvis -n {{ namespace }} --create-namespace"  
+
+        - name: Wait until all yuuvis pods running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=yuuvis"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true 
+
+        - name: Waiting untill configservice pod is ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector name=configservice --timeout=300s"
+          
+        - name: Waiting untill all yuuvis pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=yuuvis --timeout=300s"
+
+        - meta: end_host
+      rescue:
+        - name: Restarting configservice to prevent init-container availability checks from returning false positives
+          shell: kubectl delete po configservice-0 -n {{ namespace }}
+
+        - name: Restarting services for config retrival reattempt
+          shell: "kubectl rollout restart deploy -n {{ namespace }}"
+             
+        - name: Deploying yuuvis chart
+          shell: "helm upgrade --install yuuvis ./yuuvis -n {{ namespace }} --create-namespace"
+  always:         
+    - name: Checking success of yuuvis deployment    
+      block:
+        - name: Wait until all yuuvis pods running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=yuuvis"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true
+
+        - name: Waiting untill configservice pod is ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector name=configservice --timeout=300s"
+
+        - name: Waiting untill all yuuvis pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=yuuvis --timeout=300s"
+
+        - name: Deploying momentum Ingress rules namespace  
+          shell: "kubectl apply -f ingress-nginx/ingress-rules-momentum.yaml"  
+
+        - meta: end_host
+      rescue:
+        - name: Stop deployment
+          shell: /bin/false
+...

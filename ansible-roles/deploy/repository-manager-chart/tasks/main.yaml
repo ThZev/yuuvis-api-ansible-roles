@@ -1,0 +1,23 @@
+---
+- name: Deploying repository-manager chart 
+  shell: "helm upgrade --install repository-manager ./repository-manager -n {{ namespace }} --create-namespace --wait-for-jobs"   
+  
+- name: Waiting for repository-manager deployment
+  block:
+    - name: Wait until all repository-manager pods running
+      shell: "kubectl get pods -o json -n {{ namespace }} --selector release=repository-manager"
+      register: kubectl_get_pods
+      until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+      retries: 30
+      delay: 10
+      no_log: true 
+
+    - name: Waiting untill all repository-manager pods are ready
+      shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=repository-manager --timeout=300s"
+  rescue:
+    - name: Rolling back failed repository-manager release
+      shell: "helm rollback repository-manager -n {{ namespace }}"
+            
+    - name: Stop deployment
+      shell: /bin/false
+...

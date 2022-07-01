@@ -1,0 +1,19 @@
+---
+- name: Deploying Jaeger helm chart
+  shell: "helm upgrade --install jaeger ./open-telemetry/jaeger -n observability --create-namespace --atomic" 
+
+- name: Deploying otel-operator
+  shell: "kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml"
+
+- name: Waiting for operator readiness 
+  shell: "sleep 30"
+
+- name: Deploying Ingress rules to momentum namespace  
+  shell: "kubectl apply -f ingress-nginx/ingress-rule-tracing.yaml -n observability"   
+
+- name: Deploying otel-instrumentation
+  shell: "kubectl apply -f open-telemetry/otel/otel-instrumentation.yaml -n observability"  
+
+- name: Deploying otel-collector
+  shell: "kubectl apply -f open-telemetry/otel/otel-collector.yaml -n observability"
+...

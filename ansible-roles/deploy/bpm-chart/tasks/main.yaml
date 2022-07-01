@@ -1,0 +1,36 @@
+---
+- name: Deploying bpm chart
+  block:
+    - name: Installing bpm chart
+      shell: "helm upgrade --install bpm ./bpm -n {{ namespace }} --create-namespace"    
+  rescue:
+    - name: Abort ongoing upgrade/rollback/install
+      shell: | 
+        kubectl -n {{ namespace }} delete secret -l name=bpm,status=pending-upgrade --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=bpm,status=pending-rollback --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=bpm,status=pending-install --ignore-not-found=true
+
+    - name: Installing bpm chart
+      shell: "helm upgrade --install bpm ./bpm -n {{ namespace }} --create-namespace" 
+  always:
+    - name: Waiting for bpm deployment
+      block:
+        - name: Wait until all bpm pods running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=bpm"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true  
+
+        - name: Waiting untill all bpm pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=bpm --timeout=300s"
+
+        - meta: end_host  
+      rescue:
+        - name: Rolling back failed bpm release
+          shell: "helm rollback bpm -n {{ namespace }}"
+            
+        - name: Stop deployment
+          shell: /bin/false
+...

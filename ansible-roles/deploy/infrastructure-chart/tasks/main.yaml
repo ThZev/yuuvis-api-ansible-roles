@@ -1,0 +1,7 @@
+---
+- name: Installing infrastructure chart
+  shell: "helm install infrastructure ./infrastructure -n infrastructure --create-namespace --atomic --wait-for-jobs --timeout=300s" 
+
+- name: Deploying Ingress rules to infrastructure namespace  
+  shell: "kubectl apply -f ingress-nginx/ingress-rules-infrastructure.yaml"   
+...

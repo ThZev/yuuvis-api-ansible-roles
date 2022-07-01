@@ -1,0 +1,4 @@
+---
+- name: Deploying keycloak-instance chart
+  shell: helm upgrade --install keycloak-instance ./keycloak-instance -n keycloak-instance-"{{ index }}" --create-namespace --atomic --wait-for-jobs --timeout=300s
+...

@@ -1,0 +1,93 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  roles:
+    - role: ansible-roles/deploy/linkerd
+      tags: 
+        - linkerd
+
+    - role: ansible-roles/deploy/cert-manager
+      tags: 
+        - cert-manager
+
+    - role: ansible-roles/deploy/ingress-nginx-chart
+      tags: 
+        - ingress
+
+    - role: ansible-roles/dependencies/download-jaeger-dependencies
+      tags: 
+        - telemetry
+
+    - role: ansible-roles/deploy/open-telemetry-chart
+      tags: 
+        - telemetry        
+
+    - role: ansible-roles/dependencies/download-infrastructure-dependencies
+      tags: 
+        - infrastructure
+
+    - role: ansible-roles/deploy/infrastructure-chart
+      tags: 
+        - infrastructure
+
+    - role: ansible-roles/dependencies/download-keycloak-instance-dependencies
+      tags: 
+        - keycloak-instance
+
+    - role: ansible-roles/deploy/keycloak-instance-chart
+      vars:
+        index : "2"
+      tags: 
+        - keycloak-instance 
+
+    - role: ansible-roles/dependencies/download-monitoring-dependencies
+      tags: 
+        - monitoring  
+
+    - role: ansible-roles/deploy/monitoring-chart
+      tags: 
+        - monitoring
+    
+    - role: ansible-roles/deploy/yuuvis-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - yuuvis
+
+    - role: ansible-roles/deploy/keycloak-proxy-chart
+      vars:
+        namespace : yuuvis
+      tags:
+        - proxy
+
+    - role: ansible-roles/deploy/client-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - client
+
+    - role: ansible-roles/deploy/bpm-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - bpm      
+
+    - role: ansible-roles/deploy/rendition-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - rendition      
+
+    - role: ansible-roles/deploy/management-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - management   
+
+    - role: ansible-roles/deploy/repository-manager-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - repository       
+...

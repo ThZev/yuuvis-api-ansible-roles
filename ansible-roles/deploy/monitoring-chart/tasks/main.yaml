@@ -1,0 +1,7 @@
+---
+- name: Deploying monitoring chart 
+  shell: "helm upgrade --install monitoring ./monitoring -n monitoring --create-namespace --atomic --wait-for-jobs --timeout=300s"  
+
+- name: Deploying metrics server for observing resource consumption
+  shell: "kubectl apply -f monitoring/metrics-server.yaml -n kube-system"       
+...

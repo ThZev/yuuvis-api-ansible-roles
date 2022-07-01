@@ -1,0 +1,31 @@
+---
+- name: Attempting linkerd control plane deployment  
+  block:
+    - name: Deploying linkerd control plane
+      shell: linkerd install --set tracing.enabled=true | kubectl apply -f - 
+  rescue:    
+    - name: Enabling OpenCensus extension
+      shell: linkerd upgrade --set tracing.enabled=true | kubectl apply -f -
+  always: 
+    - name: Deploying metrics stack extension
+      shell: linkerd viz install | kubectl apply -f -
+
+    - name: Deploying jaeger-ui extension
+      shell: linkerd jaeger install | kubectl apply -f -
+
+    - name: Restarting services
+      shell: | 
+        kubectl -n linkerd wait deploy/jaeger --for condition=Available=True --timeout=300s
+        kubectl -n linkerd-jaeger wait deploy/collector --for condition=Available=True --timeout=300s   
+
+    - name: Deploying emojivoto for sending tracing data to jaeger-ui
+      shell: linkerd inject https://run.linkerd.io/emojivoto.yml | kubectl apply -f -
+
+    - name: Waiting for emojivoto deployment completion
+      shell: "kubectl wait deploy/web -n=emojivoto --for condition=Available=True --timeout=300s"     
+
+    - name: Pointing tracing data to jaeger-ui endpoint
+      shell: kubectl -n emojivoto set env --all deploy OC_AGENT_HOST=linkerd-jaeger.collector:55678
+
+    - meta: end_host
+...

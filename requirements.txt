@@ -1,0 +1,4 @@
+wheel
+ansible==4.10.0
+openshift
+jmespath==1.0.1

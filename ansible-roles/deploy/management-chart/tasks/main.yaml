@@ -1,0 +1,39 @@
+---
+- name: Deploying management chart  
+  block:
+    - name:  Deploying management chart
+      shell: "helm upgrade --install management ./management -n {{ namespace }} --create-namespace " 
+  rescue:
+    - name: Abort ongoing upgrade/rollback/install
+      shell: | 
+        kubectl -n {{ namespace }} delete secret -l name=management,status=pending-upgrade --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=management,status=pending-rollback --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name=management,status=pending-install --ignore-not-found=true
+
+    - name: Installing management chart
+      shell: "helm upgrade --install management ./management -n {{ namespace }} --create-namespace" 
+  always:
+    - name: Checking deployment success
+      block:
+        - name: Wait until all management pods are running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=management"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true 
+
+        - name: Waiting untill all management pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=management --timeout=300s"
+
+        - name: Waiting for tenant creation job completion
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=complete job/create-tenant-job --timeout=300s"
+
+        - meta: end_host  
+      rescue:
+        - name: Rolling back failed management release
+          shell: "helm rollback management -n {{ namespace }}"
+            
+        - name: Stop deployment
+          shell: /bin/false
+...
