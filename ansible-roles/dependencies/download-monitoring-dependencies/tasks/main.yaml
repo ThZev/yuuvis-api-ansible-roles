@@ -1,7 +1,0 @@
----
-- name: Add prometheus-community repository
-  shell: helm repo add linkerd https://prometheus-community.github.io/helm-charts   
-
-- name: Download subcharts into monitoring directory
-  shell: helm dep up monitoring
-...

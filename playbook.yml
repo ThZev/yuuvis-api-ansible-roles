@@ -89,5 +89,11 @@
       vars:
         namespace: yuuvis
       tags: 
-        - repository       
+        - repository
+
+    - role: ansible-roles/deploy/service-chart
+      vars:
+        namespace: yuuvis
+      tags: 
+        - repository          
 ...

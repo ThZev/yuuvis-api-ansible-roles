@@ -1,0 +1,36 @@
+---
+- name: Deploying service chart  
+  block:
+    - name:  Deploying service chart
+      shell: "helm upgrade --install {{ chart }} ./{{ chart_dir }} -n {{ namespace }} --create-namespace " 
+  rescue:
+    - name: Abort ongoing upgrade/rollback/install
+      shell: | 
+        kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-upgrade --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-rollback --ignore-not-found=true
+        kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-install --ignore-not-found=true
+
+    - name: Installing service chart
+      shell: "helm upgrade --install {{ chart }} ./{{ chart_dir }} -n {{ namespace }} --create-namespace" 
+  always:
+    - name: Checking deployment success
+      block:
+        - name: Wait until all {{ chart }} pods are running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release={{ chart }}"
+          register: kubectl_get_pods
+          until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+          retries: 30
+          delay: 10
+          no_log: true 
+
+        - name: Waiting untill all service pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release={{ chart }} --timeout=300s"
+
+        - meta: end_host  
+      rescue:
+        - name: Rolling back failed service release
+          shell: "helm rollback {{ chart }} -n {{ namespace }}"
+              
+        - name: Stop deployment
+          shell: /bin/false
+...

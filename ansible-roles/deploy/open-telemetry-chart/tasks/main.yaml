@@ -1,4 +1,10 @@
 ---
+- name: Addding jagertracting helm repository
+  shell: helm repo add jaegertracing https://jaegertracing.github.io/helm-charts  
+
+- name: Download subcharts into jaeger sub directory
+  shell: helm dep up open-telemetry/jaeger
+  
 - name: Deploying Jaeger helm chart
   shell: "helm upgrade --install jaeger ./open-telemetry/jaeger -n observability --create-namespace --atomic" 
 
