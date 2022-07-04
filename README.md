@@ -1,20 +1,26 @@
 YUUVIS API ANSIBLE ROLES
 =========
-
-Yuuvis api ansible roles for automated deployment of yuuvis api charts
+Yuuvis api ansible roles for deploying yuuvis api charts
 
 Requirements
 ------------
-...
+```
 ansible-galaxy collection install cloud.common
 ansible-galaxy collection install kubernetes.core
 ansible-galaxy collection install community.general
-...
+```
 
 Role Variables
 --------------
-*namespace* : yuuvis -> Deployment target for momentum charts
-*index* : 2 -> Index of keycloak-instance to deploy
+Momentum namespace
+**default** : *yuuvis*
+```
+namespace=yuuvis
+```
+Index of new keycloak Instance
+```
+*index* : 2 
+```
 
 Dependencies
 ------------
@@ -23,12 +29,25 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 
 Usage
 ----------------
-# Deploy infrastructure 
+Deploying infrastructure services
+```
 ansible-playbook playbook.yml --tags="linkerd,telemetry,cert-manager,ingress,infrastructure"
-# Deploy additional keycloak instance 
+```
+
+Deploying new keycloak instance 
+```
 ansible-playbook playbook.yml --tags="keycloak-instance" --extra-vars "index=${index}"
-# Deploy momentum charts                                                                          
+```
+
+Deploying momentum charts
+```
 ansible-playbook playbook.yml --tags="yuuvis,proxy,client,bpm,rendition,management" --extra-vars "namespace=${NAMESPACE}"
+```
+
+Deploying review charts
+```
+ansible-playbook playbook.yml --tags="review" --extra-vars "namespace=${NAMESPACE},chart=${CHART},chart_dir=${CHART_DIR}"
+```
 
 License
 -------
