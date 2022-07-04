@@ -11,9 +11,10 @@ addons:
     - python-pip
 
 install:
-  # Install ansible
-  - pip install ansible
+  # Installing dependencies
   - pip install --upgrade pip
+  - pip install -r requirements.txt
+
   # Check ansible version
   - ansible --version
 
