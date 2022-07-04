@@ -91,9 +91,9 @@
       tags: 
         - repository
 
-    - role: ansible-roles/deploy/service-chart
+    - role: ansible-roles/deploy/review-chart
       vars:
         namespace: yuuvis
       tags: 
-        - repository          
+        - review          
 ...
