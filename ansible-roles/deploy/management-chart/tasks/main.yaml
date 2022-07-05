@@ -20,7 +20,7 @@
           register: kubectl_get_pods
           until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
           retries: 30
-          delay: 10
+          delay: 20
           no_log: true 
 
         - name: Waiting untill all management pods are ready
