@@ -15,35 +15,19 @@
       tags: 
         - ingress
 
-    - role: ansible-roles/dependencies/download-jaeger-dependencies
-      tags: 
-        - telemetry
-
     - role: ansible-roles/deploy/open-telemetry-chart
       tags: 
         - telemetry        
 
-    - role: ansible-roles/dependencies/download-infrastructure-dependencies
-      tags: 
-        - infrastructure
-
     - role: ansible-roles/deploy/infrastructure-chart
       tags: 
         - infrastructure
-
-    - role: ansible-roles/dependencies/download-keycloak-instance-dependencies
-      tags: 
-        - keycloak-instance
 
     - role: ansible-roles/deploy/keycloak-instance-chart
       vars:
         index : "2"
       tags: 
         - keycloak-instance 
-
-    - role: ansible-roles/dependencies/download-monitoring-dependencies
-      tags: 
-        - monitoring  
 
     - role: ansible-roles/deploy/monitoring-chart
       tags: 
