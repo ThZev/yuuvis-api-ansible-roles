@@ -1,6 +1,9 @@
 ---
 - name: Deploying review app chart  
   block:
+    - name: Download subcharts into review app directory
+      shell: helm dep up ../{{ chart_dir }}
+
     - name:  Deploying review app chart
       shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} -n {{ namespace }} --create-namespace " 
   rescue:
