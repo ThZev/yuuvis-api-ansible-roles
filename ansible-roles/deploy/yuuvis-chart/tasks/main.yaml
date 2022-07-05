@@ -57,7 +57,7 @@
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=yuuvis --timeout=300s"
 
         - name: Deploying momentum Ingress rules namespace  
-          shell: "kubectl apply -f ingress-nginx/ingress-rules-momentum.yaml"  
+          shell: "kubectl apply -f ../ingress-nginx/ingress-rules-momentum.yaml"  
 
         - meta: end_host
       rescue:

@@ -3,7 +3,7 @@
   shell: helm repo add minio https://helm.min.io/
 
 - name: Add bitnami repository
-  shell: helm repo add bitnami https://charts.bitnami.com/bitnami     
+  shell: helm repo add bitnami https://charts.bitnami.com/bitnami
 
 - name: Download subcharts into infrastructure directory
   shell: helm dep up ../infrastructure
@@ -12,5 +12,5 @@
   shell: "helm install infrastructure ../infrastructure -n infrastructure --create-namespace --atomic --wait-for-jobs --timeout=300s" 
 
 - name: Deploying Ingress rules to infrastructure namespace  
-  shell: "kubectl apply -f ingress-nginx/ingress-rules-infrastructure.yaml"   
+  shell: "kubectl apply -f ../ingress-nginx/ingress-rules-infrastructure.yaml"   
 ...

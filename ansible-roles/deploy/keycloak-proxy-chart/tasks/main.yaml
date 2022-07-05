@@ -30,7 +30,7 @@
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=keycloak-proxy --timeout=300s" 
 
         - name: Deploying proxy Ingress rule to momentum namespace  
-          shell: "kubectl apply -f ingress-nginx/ingress-rule-proxy.yaml"
+          shell: "kubectl apply -f ../ingress-nginx/ingress-rule-proxy.yaml"
 
         - meta: end_host  
       rescue:
