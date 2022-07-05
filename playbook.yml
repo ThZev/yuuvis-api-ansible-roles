@@ -79,7 +79,7 @@
       vars:
         namespace: yuuvis
         chart: review
-        chart_dir : review
+        chart_dir: review
       tags: 
         - review          
 ...
