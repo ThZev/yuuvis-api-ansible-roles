@@ -2,7 +2,7 @@
 - name: Deploying management chart  
   block:
     - name:  Deploying management chart
-      shell: "helm upgrade --install management ./management -n {{ namespace }} --create-namespace " 
+      shell: "helm upgrade --install management ../management -n {{ namespace }} --create-namespace " 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -11,7 +11,7 @@
         kubectl -n {{ namespace }} delete secret -l name=management,status=pending-install --ignore-not-found=true
 
     - name: Installing management chart
-      shell: "helm upgrade --install management ./management -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install management ../management -n {{ namespace }} --create-namespace" 
   always:
     - name: Checking deployment success
       block:

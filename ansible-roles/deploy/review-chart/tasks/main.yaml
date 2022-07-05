@@ -2,7 +2,7 @@
 - name: Deploying review app chart  
   block:
     - name:  Deploying review app chart
-      shell: "helm upgrade --install {{ chart }} ./{{ chart_dir }} -n {{ namespace }} --create-namespace " 
+      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} -n {{ namespace }} --create-namespace " 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -11,7 +11,7 @@
         kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-install --ignore-not-found=true
 
     - name: Deploying review app chart
-      shell: "helm upgrade --install {{ chart }} ./{{ chart_dir }} -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} -n {{ namespace }} --create-namespace" 
   always:
     - name: Checking deployment success
       block:

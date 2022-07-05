@@ -2,7 +2,7 @@
 - name: Deploying bpm chart
   block:
     - name: Installing bpm chart
-      shell: "helm upgrade --install bpm ./bpm -n {{ namespace }} --create-namespace"    
+      shell: "helm upgrade --install bpm ../bpm -n {{ namespace }} --create-namespace"    
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -11,7 +11,7 @@
         kubectl -n {{ namespace }} delete secret -l name=bpm,status=pending-install --ignore-not-found=true
 
     - name: Installing bpm chart
-      shell: "helm upgrade --install bpm ./bpm -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install bpm ../bpm -n {{ namespace }} --create-namespace" 
   always:
     - name: Waiting for bpm deployment
       block:

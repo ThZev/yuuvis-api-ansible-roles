@@ -15,5 +15,5 @@
       installCRDs: true
 
 - name: Deploying certificate clusterissuer configuration
-  shell: "kubectl apply -f cert-manager/certman-clusterissuer.yaml"      
+  shell: "kubectl apply -f ../cert-manager/certman-clusterissuer.yaml"      
 ...
