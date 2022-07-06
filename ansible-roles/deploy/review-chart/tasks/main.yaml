@@ -21,6 +21,12 @@
   always:
     - name: Checking deployment success
       block:
+        - name: Waiting untill keycloak pod is ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector name=keycloak --timeout=300s"
+
+        - name: Waiting untill postgresql pod is ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector name=postgresql --timeout=300s"
+
         - name: Wait until all {{ chart }} pods are running
           shell: "kubectl get pods -o json -n {{ namespace }} --selector release={{ chart }}"
           register: kubectl_get_pods
@@ -28,9 +34,6 @@
           retries: 30
           delay: 20
           no_log: true 
-
-        - name: Waiting untill all review app pods are ready
-          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release={{ chart }} --timeout=300s"
 
         - meta: end_host  
       rescue:
