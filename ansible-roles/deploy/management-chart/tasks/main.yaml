@@ -21,7 +21,10 @@
           until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
           retries: 30
           delay: 20
-          no_log: true 
+          no_log: true
+
+        - name: Waiting for pod init completion 
+          shell: "sleep 5"  
 
         - name: Waiting untill all management pods are ready
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=management --timeout=300s"
