@@ -8,7 +8,7 @@
       shell: helm dep up ../{{ chart_dir }}
 
     - name:  Deploying review app chart
-      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} -n {{ namespace }} --create-namespace " 
+      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} --atomic -n {{ namespace }} --create-namespace " 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -17,7 +17,7 @@
         kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-install --ignore-not-found=true
 
     - name: Deploying review app chart
-      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} --atomic -n {{ namespace }} --create-namespace" 
   always:
     - name: Checking deployment success
       block:
@@ -31,9 +31,9 @@
 
         - name: Waiting for pod init completion 
           shell: "sleep 5"
-
+  
         - name: Waiting untill review pods are ready
-          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector app.kubernetes.io/instance={{ namespace }} --timeout=300s"
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release={{ chart }} --timeout=300s"
 
         - meta: end_host  
       rescue:
