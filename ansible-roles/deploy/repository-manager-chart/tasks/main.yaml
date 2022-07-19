@@ -1,6 +1,6 @@
 ---
 - name: Deploying repository-manager chart 
-  shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --create-namespace --wait-for-jobs"   
+  shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace --wait-for-jobs"   
   
 - name: Waiting for repository-manager deployment
   block:

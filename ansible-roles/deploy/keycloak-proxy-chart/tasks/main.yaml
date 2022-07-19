@@ -2,7 +2,7 @@
 - name: Deploying keycloak-proxy chart  
   block:
     - name:  Deploying keycloak-proxy chart
-      shell: "helm upgrade --install keycloak-proxy ../keycloak-proxy -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install keycloak-proxy ../keycloak-proxy -n {{ namespace }} --atomic --wait-for-jobs --create-namespace" 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -11,7 +11,7 @@
         kubectl -n {{ namespace }} delete secret -l name=keycloak-proxy,status=pending-install --ignore-not-found=true
 
     - name: Installing keycloak-proxy chart
-      shell: "helm upgrade --install keycloak-proxy ../keycloak-proxy -n {{ namespace }} --create-namespace"   
+      shell: "helm upgrade --install keycloak-proxy ../keycloak-proxy -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"   
   always:      
     - name: Waiting for keycloak-proxy deployment
       block:
@@ -26,14 +26,14 @@
         - name: Waiting for pod init completion 
           shell: "sleep 5"
 
-        - name: Waiting for keycloak-proxy-config-init job completion
-          shell: "kubectl wait --namespace={{ namespace }} --for=condition=complete job/keycloak-proxy-config-init --timeout=300s"    
-
         - name: Waiting untill all keycloak-proxy pods are ready
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=keycloak-proxy --timeout=300s" 
 
-        - name: Deploying proxy Ingress rule to momentum namespace  
-          shell: "kubectl apply -f ../ingress-nginx/ingress-rule-proxy.yaml"
+        - name: Deploying proxy Ingress rule to momentum namespace 
+          shell: |
+            if [ -d "../ingress-nginx" ]; then
+              kubectl apply -f ../ingress-nginx/ingress-rule-proxy.yaml"   
+            fi
 
         - meta: end_host  
       rescue:

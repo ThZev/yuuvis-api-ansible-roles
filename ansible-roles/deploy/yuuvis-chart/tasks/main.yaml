@@ -2,7 +2,7 @@
 - name: Attempting yuuvis chart deployment
   block:
     - name:  Deploying yuuvis chart
-      shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --create-namespace" 
+      shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --atomic --wait-for-jobs --create-namespace" 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -13,7 +13,7 @@
     - name: Attempting yuuvis chart deployment    
       block:
         - name: Deploying yuuvis chart
-          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --create-namespace"  
+          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"  
 
         - name: Wait until all yuuvis pods running
           shell: "kubectl get pods -o json -n {{ namespace }} --selector release=yuuvis"
@@ -41,7 +41,7 @@
           shell: "kubectl rollout restart deploy -n {{ namespace }}"
              
         - name: Deploying yuuvis chart
-          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --create-namespace"
+          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
   always:         
     - name: Checking success of yuuvis deployment    
       block:
@@ -63,7 +63,10 @@
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=yuuvis --timeout=300s"
 
         - name: Deploying momentum Ingress rules namespace  
-          shell: "kubectl apply -f ../ingress-nginx/ingress-rules-momentum.yaml"  
+          shell: |
+            if [ -d "../ingress-nginx" ]; then
+              kubectl apply -f ../ingress-nginx/ingress-rules-momentum.yaml"   
+            fi
 
         - meta: end_host
       rescue:
