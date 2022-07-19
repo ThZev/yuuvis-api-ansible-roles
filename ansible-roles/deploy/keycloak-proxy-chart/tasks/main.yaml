@@ -32,7 +32,7 @@
         - name: Deploying proxy Ingress rule to momentum namespace 
           shell: |
             if [ -d "../ingress-nginx" ]; then
-              kubectl apply -f ../ingress-nginx/ingress-rule-proxy.yaml"   
+              kubectl apply -f ../ingress-nginx/ingress-rule-proxy.yaml
             fi
 
         - meta: end_host  

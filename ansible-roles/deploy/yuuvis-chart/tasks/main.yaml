@@ -65,7 +65,7 @@
         - name: Deploying momentum Ingress rules namespace  
           shell: |
             if [ -d "../ingress-nginx" ]; then
-              kubectl apply -f ../ingress-nginx/ingress-rules-momentum.yaml"   
+              kubectl apply -f ../ingress-nginx/ingress-rules-momentum.yaml
             fi
 
         - meta: end_host

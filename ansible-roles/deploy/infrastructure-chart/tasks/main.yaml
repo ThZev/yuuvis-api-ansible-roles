@@ -14,7 +14,6 @@
 - name: Deploying Ingress rules to infrastructure namespace
   shell: |
     if [ -d "../ingress-nginx" ]; then
-      kubectl apply -f ../ingress-nginx/ingress-rules-infrastructure.yaml"   
-    fi
-    
+      kubectl apply -f ../ingress-nginx/ingress-rules-infrastructure.yaml   
+    fi 
 ...
