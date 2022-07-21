@@ -13,7 +13,10 @@
     - name: Attempting yuuvis chart deployment    
       block:
         - name: Deploying yuuvis chart
-          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"  
+          shell: "helm upgrade --install yuuvis ../yuuvis -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
+
+        - name: Restarting configservice as readiness bug workaround
+          shell: "kubectl rollout restart sts configservice"          
 
         - name: Wait until all yuuvis pods running
           shell: "kubectl get pods -o json -n {{ namespace }} --selector release=yuuvis"
@@ -25,9 +28,6 @@
 
         - name: Waiting for pod init completion 
           shell: "sleep 5"  
-
-        - name: Waiting untill configservice pod is ready
-          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector name=configservice --timeout=300s"
           
         - name: Waiting untill all yuuvis pods are ready
           shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=yuuvis --timeout=300s"
