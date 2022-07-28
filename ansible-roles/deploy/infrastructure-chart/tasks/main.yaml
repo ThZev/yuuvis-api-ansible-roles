@@ -4,11 +4,11 @@
     name: "{{ item.name }}"
     repo_url: "{{ item.url }}"
   loop:
-    - { name: 'mino', url: 'https://helm.min.io/' }
-    - { name: 'bitnami', url: 'https://charts.bitnami.com/bitnami' }
-    - { name: 'gitea-charts', url: 'https://dl.gitea.io/charts/'  }
-    - { name: 'bitnami-pre-2022', url: 'https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami' }
-    - { name: 'stable', url: 'https://charts.helm.sh/stable'}
+    - {name: 'mino', url: 'https://helm.min.io/'}
+    - {name: 'bitnami', url: 'https://charts.bitnami.com/bitnami'}
+    - {name: 'gitea-charts', url: 'https://dl.gitea.io/charts/' }
+    - {name: 'bitnami-pre-2022', url: 'https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami'}
+    - {name: 'stable', url: 'https://charts.helm.sh/stable'}
 
 - name: Download subcharts into infrastructure directory
   shell: helm dep up ../infrastructure

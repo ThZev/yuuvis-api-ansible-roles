@@ -25,7 +25,7 @@
 
     - role: ansible-roles/deploy/keycloak-instance-chart
       vars:
-        index : "2"
+        index: "2"
       tags:
         - keycloak-instance
 
@@ -41,7 +41,7 @@
 
     - role: ansible-roles/deploy/keycloak-proxy-chart
       vars:
-        namespace : yuuvis
+        namespace: yuuvis
       tags:
         - proxy
 

@@ -48,4 +48,3 @@
         - name: Stop deployment
           shell: /bin/false
 ...
-
