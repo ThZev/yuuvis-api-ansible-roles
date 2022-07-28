@@ -16,13 +16,18 @@
         kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-rollback --ignore-not-found=true
         kubectl -n {{ namespace }} delete secret -l name={{ chart }},status=pending-install --ignore-not-found=true
 
-    - name: Deploying review app chart
-      shell: "helm upgrade --install {{ chart }} ../{{ chart_dir }} --atomic --wait-for-jobs -n {{ namespace }} --create-namespace" 
+    - name: Attemping review chart deploy
+      block:
+        - name: Deploying review chart
+          shell: "helm upgrade --install review ../review -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
+        rescue:
+          - name: Stop deployment
+            shell: /bin/false
   always:
     - name: Checking deployment success
       block:
-        - name: Wait until all {{ chart }} pods are running
-          shell: "kubectl get pods -o json -n {{ namespace }} --selector release={{ chart }}"
+        - name: Wait until all review pods are running
+          shell: "kubectl get pods -o json -n {{ namespace }} --selector release=review"
           register: kubectl_get_pods
           until: kubectl_get_pods.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
           retries: 30
@@ -31,14 +36,14 @@
 
         - name: Waiting for pod init completion 
           shell: "sleep 5"
-  
-        - name: Waiting untill review pods are ready
-          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release={{ chart }} --timeout=300s"
+          
+        - name: Waiting untill all review pods are ready
+          shell: "kubectl wait --namespace={{ namespace }} --for=condition=Ready pods --selector release=review --timeout=300s"
 
         - meta: end_host  
       rescue:
-        - name: Rolling back failed app release
-          shell: "helm rollback {{ chart }} -n {{ namespace }}"
+        - name: Rolling back failed review release
+          shell: "helm rollback review -n {{ namespace }}"
               
         - name: Stop deployment
           shell: /bin/false

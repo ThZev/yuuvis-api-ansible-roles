@@ -10,8 +10,13 @@
         kubectl -n {{ namespace }} delete secret -l name=repository-manager,status=pending-rollback --ignore-not-found=true
         kubectl -n {{ namespace }} delete secret -l name=repository-manager,status=pending-install --ignore-not-found=true
 
-    - name: Installing repository-manager chart
-      shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace" 
+    - name: Attemping repository-manager chart deploy
+      block:
+        - name: Deploying repository-manager chart
+          shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
+        rescue:
+          - name: Stop deployment
+            shell: /bin/false
   always:
     - name: Checking deployment success
       block:

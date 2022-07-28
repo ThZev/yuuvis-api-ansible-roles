@@ -10,8 +10,13 @@
         kubectl -n {{ namespace }} delete secret -l name=management,status=pending-rollback --ignore-not-found=true
         kubectl -n {{ namespace }} delete secret -l name=management,status=pending-install --ignore-not-found=true
 
-    - name: Installing management chart
-      shell: "helm upgrade --install management ../management -n {{ namespace }} --atomic --wait-for-jobs --create-namespace" 
+    - name: Attemping management chart deploy
+      block:
+        - name: Deploying management chart
+          shell: "helm upgrade --install management ../management -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
+        rescue:
+          - name: Stop deployment
+            shell: /bin/false
   always:
     - name: Checking deployment success
       block:
