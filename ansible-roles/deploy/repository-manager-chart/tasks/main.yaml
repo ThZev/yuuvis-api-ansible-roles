@@ -2,7 +2,7 @@
 - name: Deploying repository-manager chart  
   block:
     - name:  Deploying repository-manager chart
-      shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace " 
+      shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --create-namespace " 
   rescue:
     - name: Abort ongoing upgrade/rollback/install
       shell: | 
@@ -10,13 +10,8 @@
         kubectl -n {{ namespace }} delete secret -l name=repository-manager,status=pending-rollback --ignore-not-found=true
         kubectl -n {{ namespace }} delete secret -l name=repository-manager,status=pending-install --ignore-not-found=true
 
-    - name: Attemping repository-manager chart deploy
-      block:
-        - name: Deploying repository-manager chart
-          shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
-      rescue:
-        - name: Stop deployment
-          shell: /bin/false
+    - name: Deploying repository-manager chart
+      shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --create-namespace"
   always:
     - name: Checking deployment success
       block:
