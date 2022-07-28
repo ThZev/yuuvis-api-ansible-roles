@@ -4,20 +4,20 @@
   connection: local
   roles:
     - role: ansible-roles/deploy/linkerd
-      tags: 
+      tags:
         - linkerd
 
     - role: ansible-roles/deploy/cert-manager
-      tags: 
+      tags:
         - cert-manager
 
     - role: ansible-roles/deploy/ingress-nginx-chart
-      tags: 
+      tags:
         - ingress
 
     - role: ansible-roles/deploy/open-telemetry-chart
-      tags: 
-        - telemetry        
+      tags:
+        - telemetry
 
     - role: ansible-roles/deploy/infrastructure-chart
       tags: 
@@ -26,11 +26,11 @@
     - role: ansible-roles/deploy/keycloak-instance-chart
       vars:
         index : "2"
-      tags: 
-        - keycloak-instance 
+      tags:
+        - keycloak-instance
 
     - role: ansible-roles/deploy/monitoring-chart
-      tags: 
+      tags:
         - monitoring
     
     - role: ansible-roles/deploy/yuuvis-chart
@@ -55,7 +55,7 @@
       vars:
         namespace: yuuvis
       tags: 
-        - bpm      
+        - bpm
 
     - role: ansible-roles/deploy/rendition-chart
       vars:
@@ -67,12 +67,12 @@
       vars:
         namespace: yuuvis
       tags: 
-        - management   
+        - management
 
     - role: ansible-roles/deploy/repository-manager-chart
       vars:
         namespace: yuuvis
-      tags: 
+      tags:
         - repository
 
     - role: ansible-roles/deploy/review-chart

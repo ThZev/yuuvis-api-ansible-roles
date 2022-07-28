@@ -20,9 +20,9 @@
       block:
         - name: Deploying review chart
           shell: "helm upgrade --install review ../review -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
-        rescue:
-          - name: Stop deployment
-            shell: /bin/false
+      rescue:
+        - name: Stop deployment
+          shell: /bin/false
   always:
     - name: Checking deployment success
       block:

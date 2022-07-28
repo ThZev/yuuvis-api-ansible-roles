@@ -14,9 +14,9 @@
       block:
         - name: Deploying bpm chart
           shell: "helm upgrade --install bpm ../bpm -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
-        rescue:
-          - name: Stop deployment
-            shell: /bin/false
+      rescue:
+        - name: Stop deployment
+          shell: /bin/false
   always:
     - name: Waiting for bpm deployment
       block:

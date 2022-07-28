@@ -14,9 +14,9 @@
       block:
         - name: Deploying repository-manager chart
           shell: "helm upgrade --install repository-manager ../repository-manager -n {{ namespace }} --atomic --wait-for-jobs --create-namespace"
-        rescue:
-          - name: Stop deployment
-            shell: /bin/false
+      rescue:
+        - name: Stop deployment
+          shell: /bin/false
   always:
     - name: Checking deployment success
       block:
